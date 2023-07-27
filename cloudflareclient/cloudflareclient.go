@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 )
@@ -81,7 +81,7 @@ func (c *Client) GetUnprotectedImages() ([]string, error) {
 	return unprotectedImages, nil
 }
 
-// secureImage makes a request to cloudflare to update the image to require signed urls.
+// SecureImage makes a request to Cloudflare to update the image to require signed URLs.
 func (c *Client) SecureImage(imageID string) error {
 	u := fmt.Sprintf("https://api.cloudflare.com/client/v4/accounts/%s/images/v1/%s", c.accountID, imageID)
 	req, err := http.NewRequest(http.MethodPatch, u, nil)
@@ -93,7 +93,7 @@ func (c *Client) SecureImage(imageID string) error {
 	req.Header.Add("Content-Type", "application/json")
 
 	reqBody := []byte(`{"requireSignedURLs": true}`)
-	req.Body = ioutil.NopCloser(bytes.NewReader(reqBody))
+	req.Body = io.NopCloser(bytes.NewReader(reqBody))
 	req.ContentLength = int64(len(reqBody))
 
 	resp, err := c.httpCli.Do(req)
